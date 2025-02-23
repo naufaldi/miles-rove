@@ -8,6 +8,7 @@ export interface FlightSearchParams {
   cursor?: number;
   startDate?: string;
   endDate?: string;
+  orderBy?: 'default' | 'lowest_mileage';
 }
 
 export interface FlightSearchResponse {
@@ -17,3 +18,17 @@ export interface FlightSearchResponse {
   moreURL: string;
   cursor: number;
 }
+
+export const cabinVariants = {
+  Y: 'economy',
+  W: 'premiumEconomy',
+  J: 'business',
+  F: 'first',
+} as const;
+
+export const cabinLabels = {
+  Y: 'Economy',
+  W: 'Premium Economy',
+  J: 'Business',
+  F: 'First',
+} as const;

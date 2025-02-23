@@ -14,19 +14,8 @@ import * as z from "zod"
 import { OrderBy } from "@/types"
 import { formSearchSchema } from "@/schema/flight"
 import { MultipleSelector } from "@/components/ui/multi-select"
-import { useFlightSearch } from "@/hooks/useFlight"
-import { useState } from "react"
-import { FlightSearchParams } from "@/types/flight"
 import useAirports from "@/hooks/useAirports"
 
-
-const airports = [
-  { code: "JFK", name: "New York JFK" },
-  { code: "LAX", name: "Los Angeles International" },
-  { code: "LHR", name: "London Heathrow" },
-  { code: "CDG", name: "Paris Charles de Gaulle" },
-  { code: "NRT", name: "Tokyo Narita" },
-]
 
 
 
@@ -50,23 +39,8 @@ export function SearchForm({ onSearch }: SearchFormProps) {
     },
   })
 
-  const [searchParams, setSearchParams] = useState<FlightSearchParams | null>(null)
-  const [enabled, setEnabled] = useState(false)
+  const { data: airports = [] } = useAirports()
 
-  const { data: airports = [], isLoading: isLoadingAirports } = useAirports()
-
-  const { data, isLoading } = useFlightSearch(
-    searchParams ?? {
-      originAirport: '',
-      destinationAirport: '',
-      startDate: '',
-      endDate: '',
-      take: 20
-    },
-    { enabled }
-  )
-  console.log("data", data);
-  console.log("isLoading", isLoading);
 
   const airportOptions = airports.map(airport => ({
     code: airport.code,
@@ -74,14 +48,6 @@ export function SearchForm({ onSearch }: SearchFormProps) {
   }))
 
   function onSubmit(values: z.infer<typeof formSearchSchema>) {
-    setSearchParams({
-      originAirport: values.origin.join(','),
-      destinationAirport: values.destination.join(','),
-      startDate: format(values.startDate, "yyyy-MM-dd"),
-      endDate: format(values.endDate, "yyyy-MM-dd"),
-      take: 20
-    })
-    setEnabled(true)
 
     onSearch({
       origin: values.origin.join(','),

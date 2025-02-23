@@ -2,66 +2,62 @@
 
 
 import { useState } from "react"
-import { FlightResult, OrderBy } from "@/types"
+import { OrderBy } from "@/types"
 import { SearchForm } from "@/components/flights/search-form"
 import { FlightResults } from "@/components/flights/flight-result"
-import { generateDummyFlights } from "@/data/dummyData"
+import { FlightSearchParams } from "@/types/flight"
+import { useFlightSearch } from "@/hooks/useFlight"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle } from "lucide-react"
 
 export default function Page() {
-  const [isLoading, setIsLoading] = useState(false)
-  const [flights, setFlights] = useState<FlightResult[]>([])
-  const [error, setError] = useState("")
+  const [searchParams, setSearchParams] = useState<FlightSearchParams>({
+    originAirport: '',
+    destinationAirport: '',
+    startDate: '',
+    endDate: '',
+    orderBy: 'default',
+    take: 20
+  })
 
-  const handleSearch = async (searchData: {
+  const { data, isLoading, error } = useFlightSearch(searchParams)
+
+  const handleSearch = (formData: {
     origin: string
     destination: string
     startDate: string
     endDate: string
     orderBy: OrderBy
   }) => {
-    setIsLoading(true)
-    setError("")
-
-    // Simulate API call
-    setTimeout(() => {
-      try {
-        const dummyFlights = generateDummyFlights(searchData)
-
-
-        if (searchData.orderBy === "lowest_mileage") {
-          dummyFlights.sort((a, b) => {
-            const aPrice = Math.min(
-              Number.parseInt(a.YMileageCost || "999999"),
-              Number.parseInt(a.WMileageCost || "999999"),
-              Number.parseInt(a.JMileageCost || "999999"),
-              Number.parseInt(a.FMileageCost || "999999"),
-            )
-            const bPrice = Math.min(
-              Number.parseInt(b.YMileageCost || "999999"),
-              Number.parseInt(b.WMileageCost || "999999"),
-              Number.parseInt(b.JMileageCost || "999999"),
-              Number.parseInt(b.FMileageCost || "999999"),
-            )
-            return aPrice - bPrice
-          })
-        }
-
-        setFlights(dummyFlights)
-        setIsLoading(false)
-      } catch (err) {
-        setError("Failed to fetch flights. Please try again.")
-        setIsLoading(false)
-      }
-    }, 1500)
+    setSearchParams({
+      originAirport: formData.origin,
+      destinationAirport: formData.destination,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      take: 20
+    })
   }
-
+  const handleSortChange = (orderBy: "default" | "lowest_mileage") => {
+    setSearchParams(prev => ({
+      ...prev,
+      orderBy
+    }))
+  }
+  console.log("searchParams", searchParams);
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Award ASIAN Flight Search</h1>
         <SearchForm onSearch={handleSearch} />
-        {error && <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">{error}</div>}
-        <FlightResults isLoading={isLoading} flights={flights} />
+        {error && (
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error instanceof Error ? error.message : 'An error occurred while fetching flights'}
+            </AlertDescription>
+          </Alert>
+        )}
+        <FlightResults isLoading={isLoading} flights={data?.data ?? []} searchParams={searchParams} onSortChange={handleSortChange} />
       </div>
     </div>
   )

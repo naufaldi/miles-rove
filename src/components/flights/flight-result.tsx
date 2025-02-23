@@ -1,53 +1,76 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
+
 import { Badge } from "@/components/ui/badge"
 import { Plane, ArrowRight } from "lucide-react"
 import type { FlightResult, CabinClass } from "@/types"
 import { useState } from "react"
 import { FormattedDate } from "@/components/ui/format-date"
+import { formatAirlines, formatDistance } from "@/lib/utils"
+import { cabinLabels, cabinVariants, FlightSearchParams } from "@/types/flight"
+import FlightSkeleton from "@/components/flights/skeleton"
 
 interface FlightResultsProps {
   isLoading: boolean
   flights: FlightResult[]
+  searchParams: FlightSearchParams
+  onSortChange: (orderBy: "default" | "lowest_mileage") => void
 }
 
-export function FlightResults({ isLoading, flights }: FlightResultsProps) {
+export function FlightResults({ isLoading, flights, searchParams, onSortChange }: FlightResultsProps) {
   const [selectedCabin, setSelectedCabin] = useState<CabinClass>("Y")
   const [sortBy, setSortBy] = useState<"price" | "source">("price")
 
   if (isLoading) {
     return (
-      <div className="mt-8 space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <Card key={i}>
-            <CardHeader>
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-4 w-24" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-20 w-full" />
-            </CardContent>
-          </Card>
-        ))}
+      <FlightSkeleton />
+    )
+  }
+
+  if (!flights?.length && !isLoading) {
+    return (
+      <div className="mt-8 text-center space-y-4">
+        <div className="text-gray-500">
+          {searchParams &&
+            (searchParams.originAirport || searchParams.destinationAirport) ? (
+            <p className="text-lg font-semibold">
+              No flights found
+              {searchParams.originAirport && (
+                <> from <span className="font-bold">{searchParams.originAirport}</span></>
+              )}
+              {searchParams.destinationAirport && (
+                <> to <span className="font-bold">{searchParams.destinationAirport}</span></>
+              )}
+              {searchParams.startDate && (
+                <> on <FormattedDate
+                  date={searchParams.startDate}
+                  className="font-bold"
+                /></>
+              )}
+              {searchParams.endDate && (
+                <> to <FormattedDate
+                  date={searchParams.endDate}
+                  className="font-bold"
+                /></>
+              )}
+            </p>
+          ) : (
+            <>
+              <p className="text-lg font-semibold">Ready to search flights</p>
+              <p className="text-sm mt-2">Use the search form above to find available flights</p>
+            </>
+          )}
+        </div>
       </div>
     )
   }
 
-  if (flights.length === 0) {
-    return null
-  }
 
-  const sortedFlights = [...flights].sort((a, b) => {
-    if (sortBy === "price") {
-      const aPrice = Number.parseInt(a[`${selectedCabin}MileageCost`] || "0")
-      const bPrice = Number.parseInt(b[`${selectedCabin}MileageCost`] || "0")
-      return aPrice - bPrice
-    }
-    return a.Source.localeCompare(b.Source)
-  })
 
-  const availableFlights = sortedFlights.filter((flight) => flight[`${selectedCabin}Available`])
+
+  const availableFlights = flights.filter((flight) => flight[`${selectedCabin}Available`])
+
+
 
   return (
     <div className="mt-8">
@@ -65,19 +88,22 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
               <SelectItem value="F">First</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={sortBy} onValueChange={(value: "price" | "source") => setSortBy(value)}>
+          <Select
+            value={searchParams.orderBy || "default"}
+            onValueChange={(value: "default" | "lowest_mileage") => onSortChange(value)}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="price">Sort by Price</SelectItem>
-              <SelectItem value="source">Sort by Program</SelectItem>
+              <SelectItem value="default">Best Available</SelectItem>
+              <SelectItem value="lowest_mileage">Lowest Miles</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
       <div className="space-y-4">
-        {availableFlights.map((flight) => (
+        {availableFlights.length > 0 ? availableFlights.map((flight) => (
           <Card key={flight.ID}>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -85,9 +111,17 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
                   <Plane className="h-5 w-5" />
                   <span className="capitalize">{flight.Source}</span>
                 </CardTitle>
-                <Badge variant={flight[`${selectedCabin}Direct`] ? "default" : "secondary"}>
-                  {flight[`${selectedCabin}Direct`] ? "Nonstop" : "Connection"}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={cabinVariants[selectedCabin]}>
+                    {cabinLabels[selectedCabin]}
+                  </Badge>
+                  <Badge variant="outline">
+                    {formatDistance(flight.Route.Distance)}
+                  </Badge>
+                  <Badge variant={flight[`${selectedCabin}Direct`] ? "default" : "secondary"}>
+                    {flight[`${selectedCabin}Direct`] ? "Nonstop" : "Connection"}
+                  </Badge>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -99,7 +133,9 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
                     <ArrowRight className="h-4 w-4" />
                     <div className="text-xl font-bold">{flight.Route.DestinationAirport}</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">{flight[`${selectedCabin}Airlines`]}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {formatAirlines(flight[`${selectedCabin}Airlines`])}
+                  </div>
                 </div>
                 <div>
                   <div className="text-sm font-medium">Date</div>
@@ -116,7 +152,9 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
                     <div className="text-xl font-bold">
                       {flight[`${selectedCabin}RemainingSeats`] > 0
                         ? `${flight[`${selectedCabin}RemainingSeats`]} seats`
-                        : "Available"}
+                        : flight[`${selectedCabin}Available`]
+                          ? "Available"
+                          : "Not Available"}
                     </div>
                   </div>
                 </div>
@@ -124,11 +162,12 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
                   <div className="text-sm font-medium">Price</div>
                   <div className="mt-1">
                     <div className="text-xl font-bold">
-                      {Number.parseInt(flight[`${selectedCabin}MileageCost`]).toLocaleString()} miles
+                      {Number.parseInt(flight[`${selectedCabin}MileageCost`] || "0").toLocaleString()} miles
                     </div>
                     {flight[`${selectedCabin}TotalTaxes`] > 0 && (
                       <div className="text-sm text-muted-foreground">
-                        + {flight[`${selectedCabin}TotalTaxes`].toLocaleString()} {flight.TaxesCurrency} taxes
+                        + {flight[`${selectedCabin}TotalTaxes`].toLocaleString()}
+                        {flight.TaxesCurrency ? ` ${flight.TaxesCurrency}` : ''} taxes
                       </div>
                     )}
                   </div>
@@ -136,7 +175,13 @@ export function FlightResults({ isLoading, flights }: FlightResultsProps) {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )) : (
+          <div className="mt-8 text-center space-y-4">
+            <div className="text-gray-500">
+              <p className="text-lg font-semibold">No {cabinLabels[selectedCabin]} seats available</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

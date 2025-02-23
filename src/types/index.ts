@@ -11,10 +11,9 @@ export interface Route {
 
 export interface FlightResult {
   ID: string;
-  RouteID: string;
   Route: Route;
   Date: string;
-  ParsedDate: string;
+  Source: string;
   YAvailable: boolean;
   WAvailable: boolean;
   JAvailable: boolean;
@@ -28,19 +27,18 @@ export interface FlightResult {
   WTotalTaxes: number;
   JTotalTaxes: number;
   FTotalTaxes: number;
-  YRemainingSeats: number;
-  WRemainingSeats: number;
-  JRemainingSeats: number;
-  FRemainingSeats: number;
-  YAirlines: string;
-  WAirlines: string;
-  JAirlines: string;
-  FAirlines: string;
   YDirect: boolean;
   WDirect: boolean;
   JDirect: boolean;
   FDirect: boolean;
-  Source: string;
+  YAirlines: string;
+  WAirlines: string;
+  JAirlines: string;
+  FAirlines: string;
+  YRemainingSeats: number;
+  WRemainingSeats: number;
+  JRemainingSeats: number;
+  FRemainingSeats: number;
 }
 
 export interface SearchResponse {

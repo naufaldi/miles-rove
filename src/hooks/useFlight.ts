@@ -14,7 +14,7 @@ export function useFlightSearch(
     queryKey: ['flights', params],
     queryFn: () => fetchFlights(params),
     staleTime: 5 * 60 * 1000,
-    placeholderData: (prev) => prev,
+    // placeholderData: (prev) => prev,
     enabled:
       options.enabled &&
       Boolean(params.originAirport && params.destinationAirport),
