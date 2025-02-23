@@ -76,6 +76,7 @@ export const SearchResponseSchema = z.object({
   count: z.number().default(0),
   hasMore: z.boolean().default(true),
   cursor: z.number().default(0),
+  moreURL: z.string().optional().default(''),
 });
 // Type inference from schema
 export type ValidatedFlightResult = z.infer<typeof FlightResultSchema>;

@@ -1,9 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 
-import type { FlightResult } from "@/types"
-
-
 import { CabinClass, cabinLabels, FlightSearchParams } from '@/types/flight';
 
 import FlightSkeleton from "@/components/flights/skeleton"
@@ -13,6 +10,7 @@ import { useCallback, useRef, useState, useMemo } from "react"
 import { useInfiniteFlightSearch } from "@/hooks/useInfiniteFlightSearch"
 import FlightCard from "./card/flight-card"
 import SourceFilter from "./filter/source";
+import { FlightResult } from "@/types";
 
 interface FlightResultsProps {
   isLoading: boolean
@@ -129,13 +127,14 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
         aria-label="Flight search results"
       >
         {availableFlights.length > 0 ? availableFlights.map((flight, index) => {
+          const uniqueKey = `${flight.ID}-${index}`;
           if (availableFlights.length === index + 1) {
             return (
-              <FlightCard key={flight.ID} flight={flight} selectedCabin={selectedCabin} ref={lastFlightElementRef} />
+              <FlightCard key={uniqueKey} flight={flight as FlightResult} selectedCabin={selectedCabin} ref={lastFlightElementRef} />
             );
           } else {
             return (
-              <FlightCard key={flight.ID} flight={flight} selectedCabin={selectedCabin} />
+              <FlightCard key={uniqueKey} flight={flight as FlightResult} selectedCabin={selectedCabin} />
             );
           }
         }) : (
