@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+I'll help you create a comprehensive README.md for your project.
 
-## Getting Started
+````markdown:README.md
+# Award ASIAN Flight Search
 
-First, run the development server:
+A modern web application for searching award flights across Asian airlines, built with Next.js and TypeScript. This application helps users find and compare award flight availability with an intuitive interface and real-time search capabilities.
+
+## 🌟 Features
+
+- Real-time flight search across multiple airlines
+- Multi-airport selection support
+- Flexible date range search
+- Cabin class filtering
+- Accessibility-first design (WCAG 2.2 compliant)
+- Responsive UI for all devices
+
+## 🛠 Tech Stack
+
+- **Framework:** [Next.js 15](https://nextjs.org/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components:**
+  - [Radix UI](https://www.radix-ui.com/)
+  - [Shadcn/ui](https://ui.shadcn.com/)
+- **State Management:** [TanStack Query (React Query)](https://tanstack.com/query)
+- **Form Handling:** [React Hook Form](https://react-hook-form.com/)
+- **Validation:** [Zod](https://zod.dev/)
+- **Date Handling:** [date-fns](https://date-fns.org/)
+- **Icons:** [Lucide React](https://lucide.dev/)
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have the following installed:
+- Node.js (v18.17 or higher)
+- Yarn package manager
+
+## 🚀 Getting Started
+
+### Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/award-asian-flight-search.git
+cd award-asian-flight-search
+````
+
+### Environment Setup
+
+Create a `.env.local` file in the root directory:
+
+```env
+# API Configuration
+PARTNER_AUTH=partner_auth_key
+SEATS_AERO_API_URL=seats_aero_api_url
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Install dependencies
+yarn install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Development
 
-## Learn More
+```bash
+# Start development server
+yarn dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+The application will be available at `http://localhost:3000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── api/                 # list api
+├── app/                 # Next.js app directory
+├── api/                  # Next.js api route
+├── components/         # React components
+│   ├── flights/       # Flight-related components
+│   ├── ui/            # Reusable UI components
+│   └── wcag/          # Accessibility components
+├── hooks/             # Custom React hooks
+├── lib/               # Utility functions
+├── types/             # TypeScript type definitions
+└── schema/            # Zod validation schemas
+```
