@@ -88,7 +88,13 @@ export function MultipleSelector({
 
   return (
     <div className="relative">
-      <div role="combobox" aria-expanded={open} aria-haspopup="listbox" aria-labelledby={`${name}-label`}>
+      <div
+        role="combobox"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        aria-labelledby={`${name}-label`}
+        aria-controls={`${name}-options`}
+      >
         <label
           id={`${name}-label`}
           className={cn(

@@ -112,7 +112,10 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             name="startDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>
+                  Start Date
+                  <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+                </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
@@ -144,7 +147,9 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             name="endDate"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>End Date</FormLabel>
+                <FormLabel>End Date
+                  <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+                </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>
