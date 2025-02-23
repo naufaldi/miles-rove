@@ -39,8 +39,8 @@ Before you begin, ensure you have the following installed:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/award-asian-flight-search.git
-cd award-asian-flight-search
+git clone https://github.com/naufaldi/miles-rove.git
+cd miles-rove
 ````
 
 ### Environment Setup
