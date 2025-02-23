@@ -49,8 +49,6 @@ export interface SearchResponse {
   cursor: number;
 }
 
-export type CabinClass = 'Y' | 'W' | 'J' | 'F';
-
 export type OrderBy = 'default' | 'lowest_mileage';
 
 export interface SearchParams {

@@ -9,6 +9,7 @@ export interface FlightSearchParams {
   startDate?: string;
   endDate?: string;
   orderBy?: 'default' | 'lowest_mileage';
+  cabin?: CabinClass | null;
 }
 
 export interface FlightSearchResponse {
@@ -19,16 +20,35 @@ export interface FlightSearchResponse {
   cursor: number;
 }
 
-export const cabinVariants = {
-  Y: 'economy',
-  W: 'premiumEconomy',
-  J: 'business',
-  F: 'first',
+export const CabinClass = {
+  Y: 'Y',
+  W: 'W',
+  J: 'J',
+  F: 'F',
 } as const;
 
-export const cabinLabels = {
-  Y: 'Economy',
-  W: 'Premium Economy',
-  J: 'Business',
-  F: 'First',
+export type CabinClass = (typeof CabinClass)[keyof typeof CabinClass];
+
+export const cabinLabels: Record<CabinClass, string> = {
+  [CabinClass.Y]: 'Economy',
+  [CabinClass.W]: 'Premium Economy',
+  [CabinClass.J]: 'Business',
+  [CabinClass.F]: 'First',
+} as const;
+
+export const cabinVariants: Record<
+  CabinClass,
+  | 'default'
+  | 'secondary'
+  | 'destructive'
+  | 'outline'
+  | 'economy'
+  | 'premiumEconomy'
+  | 'business'
+  | 'first'
+> = {
+  [CabinClass.Y]: 'economy',
+  [CabinClass.W]: 'premiumEconomy',
+  [CabinClass.J]: 'business',
+  [CabinClass.F]: 'first',
 } as const;

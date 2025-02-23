@@ -5,7 +5,7 @@ import { useState } from "react"
 import { OrderBy } from "@/types"
 import { SearchForm } from "@/components/flights/search-form"
 import { FlightResults } from "@/components/flights/flight-result"
-import { FlightSearchParams } from "@/types/flight"
+import { CabinClass, FlightSearchParams } from "@/types/flight"
 import { useFlightSearch } from "@/hooks/useFlight"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
@@ -43,6 +43,12 @@ export default function Page() {
       orderBy
     }))
   }
+  const handleCabinChange = (cabin: CabinClass | null) => {
+    setSearchParams(prev => ({
+      ...prev,
+      cabin
+    }))
+  }
   console.log("searchParams", searchParams);
   return (
     <div className="min-h-screen bg-gray-50">
@@ -57,7 +63,7 @@ export default function Page() {
             </AlertDescription>
           </Alert>
         )}
-        <FlightResults isLoading={isLoading} flights={data?.data ?? []} searchParams={searchParams} onSortChange={handleSortChange} />
+        <FlightResults isLoading={isLoading} flights={data?.data ?? []} searchParams={searchParams} onSortChange={handleSortChange} onCabinChange={handleCabinChange} />
       </div>
     </div>
   )

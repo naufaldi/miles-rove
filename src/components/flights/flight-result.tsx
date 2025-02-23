@@ -3,24 +3,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { Badge } from "@/components/ui/badge"
 import { Plane, ArrowRight } from "lucide-react"
-import type { FlightResult, CabinClass } from "@/types"
-import { useState } from "react"
+import type { FlightResult } from "@/types"
+
 import { FormattedDate } from "@/components/ui/format-date"
 import { formatAirlines, formatDistance } from "@/lib/utils"
-import { cabinLabels, cabinVariants, FlightSearchParams } from "@/types/flight"
+import { CabinClass, cabinLabels, cabinVariants, FlightSearchParams } from '@/types/flight';
+
 import FlightSkeleton from "@/components/flights/skeleton"
+import { AvailabilityText } from "./avaibility-text"
+import { PriceDisplay } from "./price-display"
+import { CabinBadges } from "./cabin-badge"
 
 interface FlightResultsProps {
   isLoading: boolean
   flights: FlightResult[]
   searchParams: FlightSearchParams
   onSortChange: (orderBy: "default" | "lowest_mileage") => void
+  onCabinChange: (cabin: CabinClass) => void
 }
 
-export function FlightResults({ isLoading, flights, searchParams, onSortChange }: FlightResultsProps) {
-  const [selectedCabin, setSelectedCabin] = useState<CabinClass>("Y")
-  const [sortBy, setSortBy] = useState<"price" | "source">("price")
-
+export function FlightResults({ isLoading, flights, searchParams, onSortChange, onCabinChange }: FlightResultsProps) {
+  const selectedCabin = searchParams.cabin || "all";
   if (isLoading) {
     return (
       <FlightSkeleton />
@@ -68,8 +71,15 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
 
 
 
-  const availableFlights = flights.filter((flight) => flight[`${selectedCabin}Available`])
+  const availableFlights = selectedCabin === "all"
+    ? flights
+    : flights.filter((flight) => flight[`${selectedCabin}Available`]);
 
+  const hasAnyDirectFlight = (flight: FlightResult) =>
+    Object.values(CabinClass).some(cabin => flight[`${cabin}Direct`]);
+
+  const isDirectFlight = (flight: FlightResult, cabin: CabinClass | "all") =>
+    cabin === "all" ? hasAnyDirectFlight(flight) : flight[`${cabin}Direct`];
 
 
   return (
@@ -77,15 +87,19 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">{availableFlights.length} flights found</h2>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <Select value={selectedCabin} onValueChange={(value) => setSelectedCabin(value as CabinClass)}>
+          <Select
+            value={selectedCabin}
+            onValueChange={onCabinChange}
+          >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Cabin Class" />
+              <SelectValue placeholder="All Cabins" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Y">Economy</SelectItem>
-              <SelectItem value="W">Premium Economy</SelectItem>
-              <SelectItem value="J">Business</SelectItem>
-              <SelectItem value="F">First</SelectItem>
+              <SelectItem value="all">All Cabins</SelectItem>
+              <SelectItem value={CabinClass.Y}>{cabinLabels[CabinClass.Y]}</SelectItem>
+              <SelectItem value={CabinClass.W}>{cabinLabels[CabinClass.W]}</SelectItem>
+              <SelectItem value={CabinClass.J}>{cabinLabels[CabinClass.J]}</SelectItem>
+              <SelectItem value={CabinClass.F}>{cabinLabels[CabinClass.F]}</SelectItem>
             </SelectContent>
           </Select>
           <Select
@@ -112,14 +126,12 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
                   <span className="capitalize">{flight.Source}</span>
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Badge variant={cabinVariants[selectedCabin]}>
-                    {cabinLabels[selectedCabin]}
-                  </Badge>
+                  <CabinBadges flight={flight} selectedCabin={selectedCabin} />
                   <Badge variant="outline">
                     {formatDistance(flight.Route.Distance)}
                   </Badge>
-                  <Badge variant={flight[`${selectedCabin}Direct`] ? "default" : "secondary"}>
-                    {flight[`${selectedCabin}Direct`] ? "Nonstop" : "Connection"}
+                  <Badge variant={isDirectFlight(flight, selectedCabin) ? "default" : "secondary"}>
+                    {isDirectFlight(flight, selectedCabin) ? "Nonstop" : "Connection"}
                   </Badge>
                 </div>
               </div>
@@ -134,7 +146,13 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
                     <div className="text-xl font-bold">{flight.Route.DestinationAirport}</div>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {formatAirlines(flight[`${selectedCabin}Airlines`])}
+                    {selectedCabin === "all"
+                      ? formatAirlines(Object.entries(CabinClass)
+                        .filter(([_, cabin]) => flight[`${cabin}Available`])
+                        .map(([_, cabin]) => flight[`${cabin}Airlines`])
+                        .filter(Boolean)
+                        .join(', '))
+                      : formatAirlines(flight[`${selectedCabin}Airlines`])}
                   </div>
                 </div>
                 <div>
@@ -149,27 +167,13 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
                 <div>
                   <div className="text-sm font-medium">Availability</div>
                   <div className="mt-1">
-                    <div className="text-xl font-bold">
-                      {flight[`${selectedCabin}RemainingSeats`] > 0
-                        ? `${flight[`${selectedCabin}RemainingSeats`]} seats`
-                        : flight[`${selectedCabin}Available`]
-                          ? "Available"
-                          : "Not Available"}
-                    </div>
+                    <AvailabilityText flight={flight} selectedCabin={selectedCabin} />
                   </div>
                 </div>
                 <div>
                   <div className="text-sm font-medium">Price</div>
                   <div className="mt-1">
-                    <div className="text-xl font-bold">
-                      {Number.parseInt(flight[`${selectedCabin}MileageCost`] || "0").toLocaleString()} miles
-                    </div>
-                    {flight[`${selectedCabin}TotalTaxes`] > 0 && (
-                      <div className="text-sm text-muted-foreground">
-                        + {flight[`${selectedCabin}TotalTaxes`].toLocaleString()}
-                        {flight.TaxesCurrency ? ` ${flight.TaxesCurrency}` : ''} taxes
-                      </div>
-                    )}
+                    <PriceDisplay flight={flight} selectedCabin={selectedCabin} />
                   </div>
                 </div>
               </div>
@@ -178,7 +182,7 @@ export function FlightResults({ isLoading, flights, searchParams, onSortChange }
         )) : (
           <div className="mt-8 text-center space-y-4">
             <div className="text-gray-500">
-              <p className="text-lg font-semibold">No {cabinLabels[selectedCabin]} seats available</p>
+              <p className="text-lg font-semibold">No {cabinLabels[selectedCabin as CabinClass]} seats available</p>
             </div>
           </div>
         )}
