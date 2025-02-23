@@ -27,7 +27,7 @@ export default function Page() {
       try {
         const dummyFlights = generateDummyFlights(searchData)
 
-        // Sort based on orderBy parameter
+
         if (searchData.orderBy === "lowest_mileage") {
           dummyFlights.sort((a, b) => {
             const aPrice = Math.min(
@@ -58,7 +58,7 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Award Flight Search</h1>
+        <h1 className="text-3xl font-bold text-center mb-8">Award ASIAN Flight Search</h1>
         <SearchForm onSearch={handleSearch} />
         {error && <div className="mt-4 p-4 bg-destructive/10 text-destructive rounded-md">{error}</div>}
         <FlightResults isLoading={isLoading} flights={flights} />

@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -12,6 +14,9 @@ import * as z from "zod"
 import { OrderBy } from "@/types"
 import { formSearchSchema } from "@/schema/flight"
 import { MultipleSelector } from "@/components/ui/multi-select"
+import { useFlightSearch } from "@/hooks/useFlight"
+import { useState } from "react"
+import { FlightSearchParams } from "@/types/flight"
 
 
 const airports = [
@@ -44,7 +49,32 @@ export function SearchForm({ onSearch }: SearchFormProps) {
     },
   })
 
+  const [searchParams, setSearchParams] = useState<FlightSearchParams | null>(null)
+  const [enabled, setEnabled] = useState(false)
+
+  const { data, isLoading } = useFlightSearch(
+    searchParams ?? {
+      originAirport: '',
+      destinationAirport: '',
+      startDate: '',
+      endDate: '',
+      take: 20
+    },
+    { enabled }
+  )
+  console.log("data", data);
+  console.log("isLoading", isLoading);
+
   function onSubmit(values: z.infer<typeof formSearchSchema>) {
+    setSearchParams({
+      originAirport: values.origin.join(','),
+      destinationAirport: values.destination.join(','),
+      startDate: format(values.startDate, "yyyy-MM-dd"),
+      endDate: format(values.endDate, "yyyy-MM-dd"),
+      take: 20
+    })
+    setEnabled(true)
+
     onSearch({
       origin: values.origin.join(','),
       destination: values.destination.join(','),
