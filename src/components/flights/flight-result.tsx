@@ -10,9 +10,10 @@ import { CabinClass, cabinLabels, FlightSearchParams } from '@/types/flight';
 import FlightSkeleton from "@/components/flights/skeleton"
 
 import { EmptyState } from "./empty-state"
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
 import { useInfiniteFlightSearch } from "@/hooks/useInfiniteFlightSearch"
-import FlightCard from "./flight-card"
+import FlightCard from "./card/flight-card"
+import SourceFilter from "./filter/source";
 
 interface FlightResultsProps {
   isLoading: boolean
@@ -24,7 +25,7 @@ interface FlightResultsProps {
 
 
 export function FlightResults({ isLoading, flights: initialFlights, searchParams, onSortChange, onCabinChange }: FlightResultsProps) {
-  // const [flights, setFlights] = useState(initialFlights);
+  const [selectedSource, setSelectedSource] = useState('all');
 
   const {
     data,
@@ -66,10 +67,14 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
 
 
 
-  const availableFlights = selectedCabin === "all"
-    ? flights
-    : flights.filter((flight) => flight[`${selectedCabin}Available`]);
+  // const availableFlights = selectedCabin === "all"
+  //   ? flights
+  //   : flights.filter((flight) => flight[`${selectedCabin}Available`]);
 
+  const availableFlights = flights.filter((flight) =>
+    (selectedCabin === "all" || flight[`${selectedCabin}Available`]) &&
+    (selectedSource === 'all' || flight.Source === selectedSource)
+  );
 
 
   return (
@@ -77,6 +82,8 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
       <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-semibold">{availableFlights.length} flights found</h2>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <SourceFilter selectedSource={selectedSource} onSourceChange={setSelectedSource} />
+
           <Select
             value={selectedCabin}
             onValueChange={onCabinChange}
