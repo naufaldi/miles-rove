@@ -1,17 +1,28 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { fetchFlights } from '@/api/flight';
-import { FlightSearchParams, FlightSearchResponse } from '@/types/flight';
+import { FlightSearchParams } from '@/types/flight';
 import { parseMoreUrl } from '@/lib/parse-flight-params';
+import { SearchResponseSchema, ValidatedSearchResponse } from '@/schema/flight';
 
 export function useInfiniteFlightSearch(initialParams: FlightSearchParams) {
-  return useInfiniteQuery<FlightSearchResponse, Error>({
+  return useInfiniteQuery<ValidatedSearchResponse>({
     queryKey: ['flights', initialParams],
-    queryFn: ({ pageParam = initialParams }) => fetchFlights(pageParam as FlightSearchParams),
-    getNextPageParam: (lastPage) => {
-      if (lastPage.hasMore) {
-        return parseMoreUrl(lastPage.moreURL);
+    queryFn: async ({ pageParam = initialParams }) => {
+      const response = await fetchFlights(pageParam as FlightSearchParams);
+
+      try {
+        const validatedData = SearchResponseSchema.parse(response);
+        return validatedData;
+      } catch (error) {
+        console.error('Invalid response format:', error);
+        throw new Error('Invalid response format from server');
       }
-      return undefined;
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.hasMore || lastPage.moreURL === false) {
+        return undefined;
+      }
+      return parseMoreUrl(lastPage.moreURL);
     },
     initialPageParam: initialParams,
     staleTime: 5 * 60 * 1000,
