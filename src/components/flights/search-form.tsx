@@ -114,7 +114,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
               <FormItem className="flex flex-col">
                 <FormLabel>
                   Start Date
-                  <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+                  <span className="text-red-500 ml-1" aria-hidden="true">*</span> <span className="sr-only">Required</span>
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -148,7 +148,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel>End Date
-                  <span className="text-red-500 ml-1" aria-hidden="true">*</span>
+                  <span className="text-red-500 ml-1" aria-hidden="true">*</span> <span className="sr-only">Required</span>
                 </FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>

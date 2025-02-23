@@ -9,6 +9,7 @@ import { CabinClass, FlightSearchParams } from "@/types/flight"
 import { useFlightSearch } from "@/hooks/useFlight"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import SkipLinks from "@/components/wcag/skip-link"
 
 export default function Page() {
   const [searchParams, setSearchParams] = useState<FlightSearchParams>({
@@ -52,9 +53,13 @@ export default function Page() {
   console.log("searchParams", searchParams);
   return (
     <div className="min-h-screen bg-gray-50">
+      <SkipLinks searchFormId="search-form" resultsId="flight-results" />
+
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-center mb-8">Award ASIAN Flight Search</h1>
-        <SearchForm onSearch={handleSearch} />
+        <div id="search-form">
+          <SearchForm onSearch={handleSearch} />
+        </div>
         {error && (
           <Alert variant="destructive" className="mt-4">
             <AlertCircle className="h-4 w-4" />
@@ -63,7 +68,9 @@ export default function Page() {
             </AlertDescription>
           </Alert>
         )}
-        <FlightResults isLoading={isLoading} flights={data?.data ?? []} searchParams={searchParams} onSortChange={handleSortChange} onCabinChange={handleCabinChange} />
+        <main id="flight-results">
+          <FlightResults isLoading={isLoading} flights={data?.data ?? []} searchParams={searchParams} onSortChange={handleSortChange} onCabinChange={handleCabinChange} />
+        </main>
       </div>
     </div>
   )

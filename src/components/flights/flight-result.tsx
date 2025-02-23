@@ -1,4 +1,3 @@
-
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 
@@ -10,7 +9,7 @@ import { CabinClass, cabinLabels, FlightSearchParams } from '@/types/flight';
 import FlightSkeleton from "@/components/flights/skeleton"
 
 import { EmptyState } from "./empty-state"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useRef, useState, useMemo } from "react"
 import { useInfiniteFlightSearch } from "@/hooks/useInfiniteFlightSearch"
 import FlightCard from "./card/flight-card"
 import SourceFilter from "./filter/source";
@@ -32,6 +31,7 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
+    error,
   } = useInfiniteFlightSearch(searchParams);
 
 
@@ -53,33 +53,43 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
   const flights = data?.pages.flatMap(page => page.data) || initialFlights;
   const selectedCabin = searchParams.cabin || "all";
 
+  const availableFlights = useMemo(() =>
+    flights.filter((flight) =>
+      (selectedCabin === "all" || flight[`${selectedCabin}Available`]) &&
+      (selectedSource === 'all' || flight.Source === selectedSource)
+    ),
+    [flights, selectedCabin, selectedSource]
+  );
 
   if (isLoading) {
-    return (
-      <FlightSkeleton />
-    )
+    return <FlightSkeleton />;
   }
 
   if (!flights?.length && !isLoading) {
     return <EmptyState searchParams={searchParams} />;
   }
 
+  if (error) {
+    return (
+      <div className="mt-8 text-center space-y-4" role="alert" aria-live="assertive">
+        <div className="text-red-500">
+          <p className="text-lg font-semibold">Error loading flights</p>
+          <p>Please try again later</p>
+        </div>
+      </div>
+    );
+  }
 
-
-
-  // const availableFlights = selectedCabin === "all"
-  //   ? flights
-  //   : flights.filter((flight) => flight[`${selectedCabin}Available`]);
-
-  const availableFlights = flights.filter((flight) =>
-    (selectedCabin === "all" || flight[`${selectedCabin}Available`]) &&
-    (selectedSource === 'all' || flight.Source === selectedSource)
-  );
-
+  if (isLoading && !availableFlights.length) {
+    return <FlightSkeleton />;
+  }
 
   return (
     <div className="mt-8">
-      <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div
+        className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+        aria-live="polite"
+      >
         <h2 className="text-xl font-semibold">{availableFlights.length} flights found</h2>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <SourceFilter selectedSource={selectedSource} onSourceChange={setSelectedSource} />
@@ -113,7 +123,11 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
           </Select>
         </div>
       </div>
-      <div className="space-y-4">
+      <div
+        className="space-y-4"
+        role="region"
+        aria-label="Flight search results"
+      >
         {availableFlights.length > 0 ? availableFlights.map((flight, index) => {
           if (availableFlights.length === index + 1) {
             return (
@@ -131,7 +145,11 @@ export function FlightResults({ isLoading, flights: initialFlights, searchParams
             </div>
           </div>
         )}
-        {isFetchingNextPage && <FlightSkeleton />}
+        {isFetchingNextPage && (
+          <div aria-live="polite" aria-label="Loading more flights">
+            <FlightSkeleton />
+          </div>
+        )}
       </div>
     </div>
   )
