@@ -211,6 +211,7 @@ export async function GET() {
       data: asianAirports,
     });
   } catch (error) {
+    console.error('Error fetching airports:', error);
     return NextResponse.json(
       {
         success: false,

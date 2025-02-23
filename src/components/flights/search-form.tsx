@@ -17,6 +17,7 @@ import { MultipleSelector } from "@/components/ui/multi-select"
 import { useFlightSearch } from "@/hooks/useFlight"
 import { useState } from "react"
 import { FlightSearchParams } from "@/types/flight"
+import useAirports from "@/hooks/useAirports"
 
 
 const airports = [
@@ -52,6 +53,8 @@ export function SearchForm({ onSearch }: SearchFormProps) {
   const [searchParams, setSearchParams] = useState<FlightSearchParams | null>(null)
   const [enabled, setEnabled] = useState(false)
 
+  const { data: airports = [], isLoading: isLoadingAirports } = useAirports()
+
   const { data, isLoading } = useFlightSearch(
     searchParams ?? {
       originAirport: '',
@@ -64,6 +67,11 @@ export function SearchForm({ onSearch }: SearchFormProps) {
   )
   console.log("data", data);
   console.log("isLoading", isLoading);
+
+  const airportOptions = airports.map(airport => ({
+    code: airport.code,
+    name: `${airport.city} ${airport.code} - ${airport.name}`
+  }))
 
   function onSubmit(values: z.infer<typeof formSearchSchema>) {
     setSearchParams({
@@ -96,7 +104,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                 <MultipleSelector
                   name="origin"
                   label="Origin Airports"
-                  options={airports}
+                  options={airportOptions}
                   value={field.value || []}
                   onChange={field.onChange}
                   error={form.formState.errors.origin?.message}
@@ -118,7 +126,7 @@ export function SearchForm({ onSearch }: SearchFormProps) {
                 <MultipleSelector
                   name="destination"
                   label="Destination Airports"
-                  options={airports}
+                  options={airportOptions}
                   value={field.value || []}
                   onChange={field.onChange}
                   error={form.formState.errors.destination?.message}
