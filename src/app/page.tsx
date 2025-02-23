@@ -50,7 +50,7 @@ export default function Page() {
       cabin
     }))
   }
-  console.log("searchParams", searchParams);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <SkipLinks searchFormId="search-form" resultsId="flight-results" />

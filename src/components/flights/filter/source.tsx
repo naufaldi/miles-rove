@@ -11,7 +11,7 @@ interface SourceFilterProps {
 
 const SourceFilter: FC<SourceFilterProps> = ({ selectedSource, onSourceChange }) => {
   const { data: sources } = useSources();
-  console.log(sources);
+
   return (
     <Select value={selectedSource} onValueChange={onSourceChange}>
       <SelectTrigger className="min-w-[180px] w-fit">

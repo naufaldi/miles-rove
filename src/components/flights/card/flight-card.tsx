@@ -29,12 +29,12 @@ const FlightCard: FC<FlightCardProps> = ({ flight, selectedCabin, ref }) => {
   return (
     <Card ref={ref}>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Plane className="h-5 w-5" />
             <span className="capitalize">{flight.Source}</span>
           </CardTitle>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap mb-2 mt-4 sm:my-0 items-center gap-2">
             <CabinBadges flight={flight} selectedCabin={selectedCabin} />
             <Badge variant="outline">
               {formatDistance(flight.Route.Distance)}

@@ -53,7 +53,7 @@ export function MultipleSelector({
   className,
   disabled = false,
   required = false,
-  name,
+  name = 'multi-select',
   label,
   error,
   showValidation = false
@@ -85,6 +85,7 @@ export function MultipleSelector({
 
   const isError = error || (showValidation && required && value.length < minItems)
 
+  const listboxId = `${name}-listbox`
 
   return (
     <div className="relative">
@@ -93,7 +94,7 @@ export function MultipleSelector({
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-labelledby={`${name}-label`}
-        aria-controls={`${name}-options`}
+        aria-controls={listboxId}
       >
         <label
           id={`${name}-label`}
@@ -112,7 +113,7 @@ export function MultipleSelector({
               variant="outline"
               role="combobox"
               aria-expanded={open}
-              aria-controls={`${name}-options`}
+              aria-controls={listboxId}
               aria-required={required}
               aria-invalid={isError ? "true" : "false"}
               aria-describedby={isError ? `${name}-error` : undefined}
@@ -153,11 +154,11 @@ export function MultipleSelector({
                 value={inputValue}
                 onValueChange={setInputValue}
                 onKeyDown={handleKeyDown}
-                className="border-none "
+                className="border-none"
               />
               <CommandEmpty className="py-2 px-4 text-sm">{emptyMessage}</CommandEmpty>
               <CommandGroup>
-                <CommandList id={`${name}-options`}>
+                <CommandList id={listboxId}>
                   {options
                     .filter((option) =>
                       `${option.code} ${option.name}`.toLowerCase().includes(inputValue.toLowerCase())
