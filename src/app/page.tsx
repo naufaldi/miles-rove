@@ -35,6 +35,7 @@ export default function Page() {
       destinationAirport: formData.destination,
       startDate: formData.startDate,
       endDate: formData.endDate,
+      orderBy: formData.orderBy,
       take: 20
     })
   }

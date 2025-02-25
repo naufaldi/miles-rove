@@ -21,6 +21,7 @@ export async function fetchFlights(
     ...(params.cursor && { cursor: params.cursor.toString() }),
     ...(params.startDate && { start_date: params.startDate }),
     ...(params.endDate && { end_date: params.endDate }),
+    ...(params.orderBy && { order_by: params.orderBy }),
   });
 
   const response = await fetch(`/api/flights?${searchParams}`);
