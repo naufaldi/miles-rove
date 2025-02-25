@@ -1,6 +1,3 @@
-I'll help you create a comprehensive README.md for your project.
-
-````markdown:README.md
 # Award ASIAN Flight Search
 
 A modern web application for searching award flights across Asian airlines, built with Next.js and TypeScript. This application helps users find and compare award flight availability with an intuitive interface and real-time search capabilities.
@@ -31,6 +28,7 @@ A modern web application for searching award flights across Asian airlines, buil
 ## 📋 Prerequisites
 
 Before you begin, ensure you have the following installed:
+
 - Node.js (v18.17 or higher)
 - Yarn package manager
 
@@ -41,7 +39,7 @@ Before you begin, ensure you have the following installed:
 ```bash
 git clone https://github.com/naufaldi/miles-rove.git
 cd miles-rove
-````
+```
 
 ### Environment Setup
 
