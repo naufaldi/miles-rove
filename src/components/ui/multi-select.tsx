@@ -118,7 +118,7 @@ export function MultipleSelector({
               aria-invalid={isError ? "true" : "false"}
               aria-describedby={isError ? `${name}-error` : undefined}
               className={cn(
-                "w-full justify-between pointer cursor-pointer",
+                "w-full justify-between pointer cursor-pointer h-full",
                 disabled && "opacity-50 cursor-not-allowed",
                 isError && "border-red-500 focus:ring-red-500",
                 className
